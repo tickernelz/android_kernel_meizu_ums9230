@@ -6683,16 +6683,6 @@ static ssize_t ontim_limit_soc_store(struct device *dev,
 	return size;
 }
 
-static ssize_t battery_name_show(struct device *dev,
-				struct device_attribute *attr, char *buf)
-{
-	struct charger_sysfs_ctl_item *sysfs = container_of(attr, struct charger_sysfs_ctl_item,
-							    attr_battery_name);
-	struct charger_manager *cm;
-	cm = sysfs->cm;
-	return sprintf(buf, "%s\n", cm->desc->battery_name);
-}
-
 static ssize_t
 charge_pump_present_show(struct device *dev, struct device_attribute *attr, char *buf)
 {
@@ -7321,8 +7311,7 @@ static int charger_manager_prepare_sysfs(struct charger_manager *cm)
 		sysfs->attrs[10] = &sysfs->attr_support_step_chg.attr;
 		sysfs->attrs[11] = &sysfs->attr_unknow_type_cur_control.attr;
               sysfs->attrs[12] = &sysfs->attr_soc_control.attr;
-              sysfs->attrs[13] = &sysfs->attr_battery_name.attr;
-		sysfs->attrs[14] = NULL;
+		sysfs->attrs[13] = NULL;
 
 		sysfs->attr_grp.name = name;
 		sysfs->attr_grp.attrs = sysfs->attrs;
@@ -7406,11 +7395,6 @@ static int charger_manager_prepare_sysfs(struct charger_manager *cm)
 		sysfs->attr_soc_control.show = ontim_limit_soc_show;
 		sysfs->attr_soc_control.store = ontim_limit_soc_store;
 
-		/* add battery_name*/
-		sysfs_attr_init(&sysfs->attr_battery_name.attr);
-		sysfs->attr_battery_name.attr.name = "vendor";
-		sysfs->attr_battery_name.attr.mode = 0444;
-		sysfs->attr_battery_name.show = battery_name_show;
 
 
 		if (!desc->sysfs[i].externally_control || !chargers_externally_control)
