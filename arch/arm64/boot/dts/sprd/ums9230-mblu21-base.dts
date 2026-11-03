@@ -1,0 +1,122 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+
+#include "ums9230-base.dts"
+
+/ {
+	/delete-node/ battery2;
+	/delete-node/ battery3;
+	/delete-node/ pa5g-sensor;
+
+	thermal-zones {
+		/delete-node/ pa5g-thmzone;
+	};
+};
+
+&ap_ahb {
+	sw_dispc: sw-dispc {
+		compatible = "sprd,sw-dpu";
+		status = "okay";
+		te-gpio = <&ap_gpio 0x53 1>;
+
+		swdispc_port: port {
+			swdispc_out: endpoint {
+				remote-endpoint = <&spi_connector_in>;
+			};
+		};
+	};
+
+	connector_spi: spi-connector {
+		compatible = "sprd,spi-interface";
+		status = "okay";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+
+				spi_connector_out: endpoint {
+					remote-endpoint = <&spi_panel_in>;
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+
+				spi_connector_in: endpoint {
+					remote-endpoint = <&swdispc_out>;
+				};
+			};
+		};
+	};
+};
+
+&spi0 {
+	spi-panel {
+		compatible = "sprd,generic-spi-panel";
+		status = "disabled";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0>;
+		spi-max-frequency = <24000000>;
+		reset-gpio = <&ap_gpio 0x52 0>;
+		cd-gpio = <&ap_gpio 0x5c 0>;
+		sprd,backlight = <&pwm_backlight>;
+
+		port {
+			reg = <1>;
+
+			spi_panel_in: endpoint {
+				remote-endpoint = <&spi_connector_out>;
+			};
+		};
+	};
+};
+
+&{/display-subsystem} {
+	spi_ports = <&swdispc_port>;
+};
+
+&cache_efuse {
+	dvfs_bin_cpu1_1: dvfs-bin-cpu1_1@1a {
+		reg = <0x1a 0x4>;
+		bits = <0x5 0x3>;
+	};
+};
+
+&cpufreq_clus1 {
+	nvmem-cells = <&dvfs_bin_cpu1>, <&dvfs_bin_cpu1_1>;
+	nvmem-cell-names = "dvfs_bin", "dvfs_bin_1";
+};
+
+&sdio3 {
+	sprd,phy-delay-mmc-highspeed = <0x7f 0x97 0x97 0x97>;
+};
+
+&ufs {
+	vdd-vddcore-supply = <&vddcore>;
+	vdd-vddgen0-supply = <&vddgen0>;
+	vdd-vddmodem-supply = <&vddmodem>;
+	vdd-avdd12-supply = <&avdd12>;
+	vdd-avdd18-supply = <&avdd18>;
+};
+
+&sound_vbc_v4_sprd_codec {
+	/delete-node/ sprd-audio-card,dai-link@90;
+	/delete-node/ sprd-audio-card,dai-link@91;
+	/delete-node/ sprd-audio-card,dai-link@98;
+	/delete-node/ sprd-audio-card,dai-link@99;
+	/delete-node/ sprd-audio-card,dai-link@100;
+	/delete-node/ sprd-audio-card,dai-link@101;
+	/delete-node/ sprd-audio-card,dai-link@102;
+	/delete-node/ sprd-audio-card,dai-link@103;
+	/delete-node/ sprd-audio-card,dai-link@104;
+	/delete-node/ sprd-audio-card,dai-link@105;
+	/delete-node/ sprd-audio-card,dai-link@106;
+	/delete-node/ sprd-audio-card,dai-link@107;
+	/delete-node/ sprd-audio-card,dai-link@108;
+	/delete-node/ sprd-audio-card,dai-link@109;
+};

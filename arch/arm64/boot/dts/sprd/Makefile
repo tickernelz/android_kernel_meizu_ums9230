@@ -53,6 +53,27 @@ ums9230-6h10-umb9230s-overlay.dtbo-base := ums9230-base.dtb
 ums9230-6h10-customer-overlay.dtbo-base := ums9230-base.dtb
 ums9230-6h10-go-overlay.dtbo-base := ums9230-base.dtb
 ums9230-14c10-go-overlay.dtbo-base := ums9230-base.dtb
+
+dtb-$(CONFIG_ARCH_SPRD) += \
+	ums9230-mblu21-14c10-go-overlay.dtbo \
+	ums9230-mblu21-1h10_go-overlay.dtbo \
+	ums9230-mblu21-1h10-overlay.dtbo \
+	ums9230-mblu21-4h10-go-overlay.dtbo \
+	ums9230-mblu21-4h10-overlay.dtbo \
+	ums9230-mblu21-6h10-customer-overlay.dtbo \
+	ums9230-mblu21-6h10-go-overlay.dtbo \
+	ums9230-mblu21-6h10-overlay.dtbo \
+	ums9230-mblu21-6h10-umb9230s-overlay.dtbo
+
+ums9230-mblu21-14c10-go-overlay.dtbo-base := ums9230-mblu21-base.dtb
+ums9230-mblu21-1h10_go-overlay.dtbo-base := ums9230-mblu21-base.dtb
+ums9230-mblu21-1h10-overlay.dtbo-base := ums9230-mblu21-base.dtb
+ums9230-mblu21-4h10-go-overlay.dtbo-base := ums9230-mblu21-base.dtb
+ums9230-mblu21-4h10-overlay.dtbo-base := ums9230-mblu21-base.dtb
+ums9230-mblu21-6h10-customer-overlay.dtbo-base := ums9230-mblu21-base.dtb
+ums9230-mblu21-6h10-go-overlay.dtbo-base := ums9230-mblu21-base.dtb
+ums9230-mblu21-6h10-overlay.dtbo-base := ums9230-mblu21-base.dtb
+ums9230-mblu21-6h10-umb9230s-overlay.dtbo-base := ums9230-mblu21-base.dtb
 endif
 
 ifeq ($(BSP_BUILD_FAMILY),qogirn6pro)
