@@ -2040,6 +2040,36 @@ static int cm_set_charger_ovp(struct charger_manager *cm, int cmd)
 	return 0;
 }
 
+static void cm_set_charger_prop(struct charger_manager *cm,
+				enum power_supply_property psp, int value)
+{
+	struct charger_desc *desc = cm->desc;
+	struct power_supply *psy;
+	union power_supply_propval val;
+	int i;
+
+	if (!desc->psy_charger_stat) {
+		dev_err(cm->dev, "psy_charger_stat is null!!!\n");
+		return;
+	}
+
+	for (i = 0; desc->psy_charger_stat[i]; i++) {
+		psy = power_supply_get_by_name(desc->psy_charger_stat[i]);
+		if (!psy) {
+			dev_err(cm->dev, "Cannot find power supply \"%s\"\n",
+				desc->psy_charger_stat[i]);
+			return;
+		}
+
+		val.intval = value;
+		if (power_supply_set_property(psy, psp, &val)) {
+			power_supply_put(psy);
+			return;
+		}
+		power_supply_put(psy);
+	}
+}
+
 static int cm_enable_second_charger(struct charger_manager *cm, bool enable)
 {
 
@@ -8161,6 +8191,9 @@ static void cm_batt_works(struct work_struct *work)
 		 cm->desc->charger_type, board_temp, cur_temp,
 		 cm->desc->thm_info.thm_adjust_cur/1000, cm->desc->thm_info.thm_pwr/1000,
 		 cm->desc->is_fast_charge, cm->desc->enable_fast_charge, term_vol/1000,ffs_status/1000);
+
+	cm_set_charger_prop(cm, POWER_SUPPLY_PROP_CURRENT_NOW, batt_uA / 1000);
+	cm_set_charger_prop(cm, POWER_SUPPLY_PROP_VOLTAGE_NOW, batt_uV / 1000);
 #if 0
 	switch (cm->desc->charger_status) {
 	case POWER_SUPPLY_STATUS_CHARGING:
