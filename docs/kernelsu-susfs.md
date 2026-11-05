@@ -1,15 +1,17 @@
 # KernelSU and SUSFS in this kernel
 
 `drivers/kernelsu` holds the SukiSU-Ultra kernel source, branch `builtin`, commit
-`1cfa57340590971cba7521ed536da8ebbedc5f0a`, vendored unchanged. That branch is the one that
+`1cfa57340590971cba7521ed536da8ebbedc5f0a`, vendored with three local deltas (below). That branch is the one that
 carries `CONFIG_KSU_SUSFS`, the `CMD_SUSFS_*` supercall dispatch (`supercall/dispatch.c`)
 and the hook entry points the kernel has to call; `main` and KernelSU-Next keep SUSFS
 out of the kernel.
 
 The SUSFS4KSU patch `0001-susfs-android13-5.15.patch` (kept in
-`tickernelz/android_kernel_meizu_mblu21` under `patches/`) is applied on top. Besides
+`tickernelz/android_kernel_meizu_mblu21` under `patches/`, 30 files +4574/-4) is applied on top. Besides
 `fs/susfs.c` and the proc, selinux and mm hooks, it inserts the KernelSU hook call sites,
-so no hand-written hook patch is needed:
+so no hand-written hook bodies are needed; the hook *call sites* it inserts are fixed up in one
+place, `include/linux/ksu_su_compat.h`, which is also where `ksu_su_compat_enabled` is declared.
+The sites are:
 
 | File | Call |
 |---|---|
@@ -30,7 +32,7 @@ expects.
 
 ```
 zcat /proc/config.gz | grep -E '^CONFIG_KSU'      # CONFIG_KSU=y, CONFIG_KSU_SUSFS=y
-ksud feature list                                 # su_compat, kernel_umount, selinux_hide enabled
+ksud feature list                                 # kernel_umount starts disabled; enable it with ksud feature set
 ls /sys/fs/susfs                                  # susfs is built in, no guard LKM needed
 ksud susfs status
 ```
@@ -38,3 +40,17 @@ ksud susfs status
 With the driver built in, `init_boot` is the plain source build again: nothing loads
 `kernelsu.ko` from the ramdisk. A module that still ships `susfs_guard_lkm.ko` only
 duplicates it and has to be disabled.
+
+## Local deltas against the vendored branch
+
+`1cfa5734` is copied as-is except these, each needed on this tree:
+
+| File | Delta |
+|---|---|
+| `drivers/kernelsu/Makefile` | `KSU_VERSION`, `VERSION_TAG` and `KSU_VERSION_FULL` come from fixed values for the vendored commit instead of `git` and `api.github.com`; the build namespace has no network, so the computed value used to change per host (44148 now) |
+| `fs/exec.c`, `fs/open.c`, `fs/stat.c` | `ksu_su_compat_enabled` is declared once in `include/linux/ksu_su_compat.h` as `bool` and read with `READ_ONCE()`; declaring it locally as `struct static_key_true` made `__jump_table` resolve one byte off into `ksu_module_mounted` |
+| `fs/read_write.c` | the `ksu_handle_sys_read` call passes `&buf` and `&count`, matching the three-argument definition |
+
+`CONFIG_KSU` is `default y` inside `drivers/kernelsu/Kconfig`, so any build of this tree that
+does not mention it still gets the driver. Whether that default stays is an open decision
+(ZHA-4925); until then this work stays on the `zha4900-ksu` branch.
