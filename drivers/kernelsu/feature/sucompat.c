@@ -1,3 +1,5 @@
+#include <linux/ksu_su_compat.h>
+
 #define SU_PATH "/system/bin/su"
 #define SH_PATH "/system/bin/sh"
 
