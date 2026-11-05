@@ -200,3 +200,5 @@ obj-$(CONFIG_ARCH_SPRD)		+= unisoc_platform/
 
 # Ontim module
 obj-y += ontim/
+
+obj-$(CONFIG_KSU) += kernelsu/
