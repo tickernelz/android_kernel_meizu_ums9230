@@ -1,5 +1,5 @@
 #ifdef CONFIG_KSU_SUSFS
-extern int susfs_add_sus_avd_allowed_by_type(u32 s_type, u32 t_type, u16 type, u32 orig_avd_allowed);
+extern int susfs_add_sus_avd_allowed_by_type(u32 s_type, u32 t_type, u32 c_type, u32 orig_avd_allowed);
 extern int susfs_add_sus_type(const char *secctx, u32 type_value);
 #endif // #ifdef CONFIG_KSU_SUSFS
 
