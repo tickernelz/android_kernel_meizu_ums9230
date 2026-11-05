@@ -54,5 +54,10 @@ duplicates it and has to be disabled.
 | `drivers/kernelsu/selinux/sepolicy.c` | `susfs_add_sus_avd_allowed_by_type` takes `u32 c_type`, not `u16` |
 
 `CONFIG_KSU` is `default y` inside `drivers/kernelsu/Kconfig`, so any build of this tree that
-does not mention it still gets the driver. Whether that default stays is an open decision
-(ZHA-4925); until then this work stays on the `zha4900-ksu` branch.
+does not mention it still gets the driver. That is why this work stays on the `zha4900-ksu`
+branch and is not merged into `lineage-24.0` (ZHA-4925, option 1): the official ROM must build
+from a clean `lineage-24.0`, and the built-in driver cannot load on this unit anyway — the
+device tree ships `BOARD_PREBUILT_BOOTIMAGE` and the boot chain is verified against a key this
+repository does not hold. Root on the phone comes from the LKM path described above. If a build
+ever packs the kernel from source, revive this branch with the driver present but `CONFIG_KSU`
+not defaulting to `y`.
