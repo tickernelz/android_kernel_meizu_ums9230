@@ -47,9 +47,11 @@ duplicates it and has to be disabled.
 
 | File | Delta |
 |---|---|
-| `drivers/kernelsu/Makefile` | `KSU_VERSION`, `VERSION_TAG` and `KSU_VERSION_FULL` come from fixed values for the vendored commit instead of `git` and `api.github.com`; the build namespace has no network, so the computed value used to change per host (44148 now) |
+| `drivers/kernelsu/Makefile` | `KSU_VERSION`, `VERSION_TAG` and `KSU_VERSION_FULL` come from fixed values for the vendored commit instead of `git` and `api.github.com`; the build namespace has no network, so the computed value used to change per host (41148 now, from `KSU_UPSTREAM_MAIN_COMMITS` = the upstream `main` commit count when this was vendored) |
 | `fs/exec.c`, `fs/open.c`, `fs/stat.c` | `ksu_su_compat_enabled` is declared once in `include/linux/ksu_su_compat.h` as `bool` and read with `READ_ONCE()`; declaring it locally as `struct static_key_true` made `__jump_table` resolve one byte off into `ksu_module_mounted` |
 | `fs/read_write.c` | the `ksu_handle_sys_read` call passes `&buf` and `&count`, matching the three-argument definition |
+| `drivers/kernelsu/feature/sucompat.c` | includes `linux/ksu_su_compat.h`, so the compiler matches the definition with the declaration the `fs/*` hook sites use |
+| `drivers/kernelsu/selinux/sepolicy.c` | `susfs_add_sus_avd_allowed_by_type` takes `u32 c_type`, not `u16` |
 
 `CONFIG_KSU` is `default y` inside `drivers/kernelsu/Kconfig`, so any build of this tree that
 does not mention it still gets the driver. Whether that default stays is an open decision
